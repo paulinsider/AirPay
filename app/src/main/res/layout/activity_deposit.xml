@@ -1,0 +1,72 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+    android:layout_height="fill_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@color/gesture_background"
+    android:orientation="vertical"
+    tools:context="com.air.yanrunfa.airpay.DepositActivity">
+
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="请放入钞票"
+        android:textSize="45sp"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:layout_marginBottom="40dp"
+        />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="金额：100.00"
+        android:textSize="40sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/deposit_money"
+        android:layout_marginBottom="20dp"
+        />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="张数：1"
+        android:textSize="40sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/deposit_number"
+        android:layout_marginBottom="20dp"
+        />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="重新放入"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/deposit_reput"
+        android:layout_marginBottom="20dp"
+        />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="确定"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/deposit_accept"
+        android:layout_marginBottom="20dp"
+        />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="取消"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/deposit_cancel"
+        android:layout_marginBottom="20dp"
+        />
+
+</LinearLayout>

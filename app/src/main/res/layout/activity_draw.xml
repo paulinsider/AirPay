@@ -1,0 +1,83 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.air.yanrunfa.airpay.DrawActivity"
+    android:background="@color/gesture_background"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="选择要取出的金额:"
+        android:textSize="35sp"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:layout_marginBottom="15dp"
+        />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="100"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/draw_100"
+        android:layout_marginBottom="15dp"
+        />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="200"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/draw_200"
+        android:layout_marginBottom="15dp"
+
+        />
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="500"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/draw_500"
+        android:layout_marginBottom="15dp"
+
+        />
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="1000"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/draw_1000"
+        android:layout_marginBottom="15dp"
+
+        />
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="2000"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/draw_2000"
+        android:layout_marginBottom="15dp"
+
+        />
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="输入金额"
+        android:textSize="30sp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/draw_input"
+        android:layout_marginBottom="15dp"
+        />
+
+
+</LinearLayout>
