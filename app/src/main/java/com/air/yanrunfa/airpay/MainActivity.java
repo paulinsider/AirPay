@@ -23,6 +23,7 @@ import com.air.network.ExitAppliation;
 import com.air.network.Login;
 import com.air.network.Register;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import way.pattern.App;
@@ -108,8 +109,14 @@ public class MainActivity extends Activity {
             //String ip=getIntent().getStringExtra("ip");
             String ip="101.200.161.130";
             handler=new mHandler(this);
-            Login login=new Login(bytes,imei,this,ip,handler);
-            login.work();
+            try{
+                Login login=new Login(bytes,imei,this,ip,handler);
+                login.work();
+            } catch (IOException e)
+            {
+
+            }
+
             while(Login.consumingTime==-1)
             {
                 if (Login.wronflag>5)

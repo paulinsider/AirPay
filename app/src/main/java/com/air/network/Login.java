@@ -21,13 +21,13 @@ public class Login {
     private byte[] logn={0x05,0x10,0x10,0x10,0x4C,0x4F,0x47,0x4E};
     private byte[] accp={0x06,0x10,0x10,0x10,0x41,0x43,0x43,0x50};
     private byte[] pw=new byte[320];
-    private byte[] IMEI=new byte[16];
+    private byte[] IMEI=new byte[32];
     private byte[] k=new byte[16];
     private byte[] Original=new byte[336];
     private byte[] error={0x00,0x10,0x10,0x10,0x11,0x11,0x11,0x11};
     private byte[] success={0x0c,0x10,0x10,0x10,0x53,0x55,0x43,0x45};
     public static String ip;
-    private byte[] save=new byte[352];
+    private byte[] save=new byte[368];
     private Context ctx;
     private long t;
     private byte[] b=new byte[16];
@@ -37,14 +37,14 @@ public class Login {
     public static int usermoney=0;
     public static long consumingTime=-1;
     public static int wronflag=0;
-    public Login(byte[] pw1,String imei,Context cctx,String IP,Handler hand)
+    public Login(byte[] pw1,String imei,Context cctx,String IP,Handler hand) throws IOException
     {
         wronflag=0;
         handl=hand;
         ip=IP;
         pw=pw1;
         ie=imei;
-        IMEI=MD5.strToMD5(imei);
+        IMEI=SM3.hash(imei.getBytes());
         ctx=cctx;
         SharedPreferences sp= ctx.getSharedPreferences(LOCK_PASSWORD_SALT_FILE,ctx.MODE_PRIVATE);
         SharedPreferences saveOriginal=ctx.getSharedPreferences("Original",ctx.MODE_PRIVATE);
@@ -65,19 +65,19 @@ public class Login {
         byte[] finalcipher=new byte[416];
         byte[] finabyte=new byte[416];
         ccipher=Cipher.toCharArray();
-        for (int i=0;i<352;i++)
+        for (int i=0;i<368;i++)
             finalcipher[i]=(byte)ccipher[i];
         SMS4 JustUse=new SMS4();
-        JustUse.sms4(finalcipher,352,b,finabyte,0);
-        for (int i=0;i<352;i++)
+        JustUse.sms4(finalcipher,368,b,finabyte,0);
+        for (int i=0;i<368;i++)
         {
-            if (i<336)
+            if (i<352)
             {
                 Original[i]=finabyte[i];
             }
             else
             {
-                k[i-336]=finabyte[i];
+                k[i-352]=finabyte[i];
             }
         }
     }
@@ -88,10 +88,11 @@ public class Login {
         Wthread.interrupt();
     }
 
-    class WorkThread extends Thread{
-
+    class WorkThread extends Thread
+    {
         int RecvNumber=0;
         byte[] Recv=new byte[432];
+        byte[] newkey = new byte[16];
         SMS4 JustUseFunction=new SMS4();
         int flag=0,fflag=0;
         byte[] Encode=new byte[432];
@@ -116,7 +117,7 @@ public class Login {
                         send(out,logn,8);
                         fflag=1;
                     }
-                    RecvNumber = recv(bin, Recv);
+                        RecvNumber = recv(bin, Recv);
                     int flag = Recv[0];
                     byte[] sendbuff = new byte[800];
                     for (int i = 4; i < RecvNumber; i++) {
@@ -145,16 +146,16 @@ public class Login {
                         }
                         else
                         {
-                            byte[] temp=new byte[20];
+                            byte[] temp=new byte[36];
                             temp[0]=0x07;
                             temp[1]=0x10;
                             temp[2]=0x10;
                             temp[3]=0x10;
-                            for (int i=4;i<20;i++)
+                            for (int i=4;i<36;i++)
                             {
                                 temp[i]=IMEI[i-4];
                             }
-                            send(out,temp,20);
+                            send(out,temp,36);
                         }
                     }
                     if (flag==8)
@@ -164,17 +165,18 @@ public class Login {
                         out = socket.getOutputStream();
                         bin = socket.getInputStream();
                         */JustUseFunction.sms4(sendbuff, RecvNumber-4, k, Encode, 0);
-                        Decode = encrypt(Encode);
-                        byte[] temp=new byte[676];
+                        newkey = sm3key(Encode);
+                        Decode = encrypt(newkey);
+                        byte[] temp=new byte[708];
                         temp[0]=0x09;
                         temp[1]=0x10;
                         temp[2]=0x10;
                         temp[3]=0x10;
-                        for (int i=4;i<676;i++)
+                        for (int i=4;i<708;i++)
                         {
                             temp[i]=Decode[i-4];
                         }
-                        send(out,temp,676);
+                        send(out,temp,708);
                     }
 
                     if (flag==10) {
@@ -182,16 +184,17 @@ public class Login {
                         socket = new Socket(ip, 10000);
                         out = socket.getOutputStream();
                         bin = socket.getInputStream();
-                        */JustUseFunction.sms4(sendbuff, RecvNumber - 4, Encode, Encode01, 0);
+                        */
+                        JustUseFunction.sms4(sendbuff, RecvNumber - 4, newkey, Encode01, 0);
                         if (save(Encode01) == 1) {
                             //SharedPreferences sp = ctx.getSharedPreferences(LOCK_PASSWORD_SALT_FILE, ctx.MODE_PRIVATE);
                             SharedPreferences saveOriginal = ctx.getSharedPreferences("Original", ctx.MODE_PRIVATE);
 
-                            byte[] MustSave = new byte[352];
-                            char[] turn = new char[352];
+                            byte[] MustSave = new byte[368];
+                            char[] turn = new char[368];
                             String FinalSave;
-                            JustUseFunction.sms4(save, 352, b, MustSave, 1);
-                            for (int i = 0; i < 352; i++) {
+                            JustUseFunction.sms4(save, 368, b, MustSave, 1);
+                            for (int i = 0; i < 368; i++) {
                                 turn[i] = (char) MustSave[i];
                             }
                             FinalSave = String.valueOf(turn);
@@ -281,58 +284,75 @@ public class Login {
         return a;
     }
 
-    public byte[] encrypt(byte[] key)
+    public byte[] encrypt(byte[] key) throws IOException
     {
-        byte[] EncrytAnswer=new byte[672];
-        byte[] value=new byte[672];
-        byte[] PwYS=new byte[656];
-        byte[] MD5PwYS=new byte[16];
+        byte[] EncrytAnswer=new byte[704];
+        byte[] value=new byte[704];
+        byte[] PwYS=new byte[672];
+        byte[] SM3PwYS=new byte[32];
         SMS4 temp=new SMS4();
         System.arraycopy(pw,0,PwYS,0,320);
-        System.arraycopy(Original,0,PwYS,320,336);
-        MD5PwYS=MD5.bytesToMD5(PwYS);
-        System.arraycopy(pw,0,value,0,320);
-        System.arraycopy(Original,0,value,320,336);
-        System.arraycopy(MD5PwYS,0,value,656,16);
-        temp.sms4(value,672,key,EncrytAnswer,1);
+        System.arraycopy(Original,0,PwYS,320,352);
+        SM3PwYS=SM3.hash(PwYS);
+        //System.arraycopy(pw,0,value,0,320);
+        System.arraycopy(PwYS,0,value,0,672);
+        System.arraycopy(SM3PwYS,0,value,672,32);
+        temp.sms4(value,704,key,EncrytAnswer,1);
         return EncrytAnswer;
     }
 
-    public int save(byte[] value)
+    public int save(byte[] value) throws IOException
     {
-        byte[] Front=new byte[352];
-        byte[] Down=new byte[16];
-        byte[] Md5Front=new byte[16];
+        byte[] Front=new byte[416];
+        byte[] Down=new byte[32];
+        byte[] SM3Front=new byte[32];
         byte[] NewK=new byte[16];
-        for (int i=0;i<368;i++)
+        for (int i=0;i<416;i++)
         {
-            if (i<352)
+            if (i<384)
             {
                 Front[i]=value[i];
-                if (i>=336&&i<352)
+                if (i>=352&&i<384)
                 {
-                    NewK[i-336]=value[i];
+                    NewK[i-352]=value[i];
                 }
             }
             else
             {
-                Down[i-352]=value[i];
+                Down[i-384]=value[i];
             }
         }
-        Md5Front=MD5.bytesToMD5(Front);
-        for (int i=0;i<16;i++)
+        SM3Front=SM3.hash(Front);
+        for (int i=0;i<32;i++)
         {
-            if (Md5Front[i]!=Down[i])
+            if (SM3Front[i]!=Down[i])
             {
                 return 0;
             }
         }
-        k=NewK;
+        k= sm3key(NewK);
         Original=Front;
         byte[] tmp=new byte[416];
-        System.arraycopy(Original,0,tmp,0,336);
-        System.arraycopy(k,0,tmp,336,16);
+        System.arraycopy(Original,0,tmp,0,352);
+        System.arraycopy(k,0,tmp,352,16);
         save=tmp;
         return 1;
+    }
+
+    public byte[] sm3key(byte[] x) throws IOException
+    {
+        byte[] sm3 = new byte[32];
+        byte[] result = new byte[16];
+        byte[] sm31 = new byte[16];
+        byte[] sm32 = new byte[16];
+        SMS4 en = new SMS4();
+        sm3 = SM3.hash(x);
+        for (int i=0;i < 16;i++)
+        {
+            sm31[i] = sm3[i];
+            sm32[i] = sm3[i+16];
+        }
+        en.sms4(sm31, x.length, sm32, result, 0);
+        return result;
     }
 }

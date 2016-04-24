@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: E:\\android project\\AirPay\\openCVLibrary300rc1\\src\\main\\aidl\\org\\opencv\\engine3\\OpenCVEngineInterface.aidl
+ * Original file: E:\\androidproject\\AirPay\\openCVLibrary300rc1\\src\\main\\aidl\\org\\opencv\\engine3\\OpenCVEngineInterface.aidl
  */
 package org.opencv.engine3;
 /**

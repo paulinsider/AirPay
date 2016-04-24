@@ -15,6 +15,7 @@ import com.air.network.Cdata;
 import com.air.network.ExitAppliation;
 import com.air.network.Login;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 /**
@@ -85,8 +86,13 @@ public class PayActivity extends Activity{
             //String ip=getIntent().getStringExtra("ip");
             String ip="101.200.161.130";
             handler=new mHandler(this);
-            Login login=new Login(bytes,imei,this,ip,handler);
-            login.work();
+            try{
+                Login login=new Login(bytes,imei,this,ip,handler);
+                login.work();
+            } catch (IOException E) {
+
+            }
+
             while(Login.consumingTime==-1)
             {
                 if (Login.wronflag>5)

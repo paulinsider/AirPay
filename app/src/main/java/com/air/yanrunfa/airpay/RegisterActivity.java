@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.air.network.ExitAppliation;
 import com.air.network.Register;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 
@@ -47,13 +48,24 @@ public class RegisterActivity extends Activity {
         editText=(EditText)findViewById(R.id.register_id_code);
         button=(Button)findViewById(R.id.register_button);
         button.setOnClickListener(onClickListener);
-        bytes=getIntent().getBundleExtra("palmprint").getByteArray("palmprint");
+        //bytes=getIntent().getBundleExtra("palmprint").getByteArray("palmprint");
+        byte[] bytes = new byte[384];
+        for (int i =0;i<384;i++)
+        {
+            bytes[i] = 0x01;
+        }
         String imei=((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
         //String ip=getIntent().getStringExtra("ip");
         String ip="101.200.161.130";
         handler=new mHandler(this);
-        register=new Register(bytes,imei,this,ip,handler);
-        register.work();
+        try{
+            register=new Register(bytes,imei,this,ip,handler);
+            register.work();
+        } catch (IOException e){
+
+        }
+
+
     }
 
 
