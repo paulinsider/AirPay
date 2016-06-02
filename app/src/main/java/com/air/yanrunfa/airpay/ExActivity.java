@@ -65,18 +65,18 @@ public class ExActivity extends Activity {
         button.setOnClickListener(onClickListener);*/
         SharedPreferences saveOriginal=getSharedPreferences("Original",ExActivity.this.MODE_PRIVATE);
         if (saveOriginal.getString("cipher",null)==null){
-            //Intent intent=new Intent(ExActivity.this, CameraActivity.class);
-            //intent.putExtra("register",true);
-            Intent intent=new Intent(ExActivity.this, RegisterActivity.class);
+            Intent intent=new Intent(ExActivity.this, CameraActivity.class);
+            intent.putExtra("register",true);
+            //Intent intent=new Intent(ExActivity.this, RegisterActivity.class);
             //intent.putExtra("ip",editText.getText().toString());
 
             startActivity(intent);
         }
         else if (!getIntent().getBooleanExtra("isLogin",false)){
-            //Intent intent=new Intent(ExActivity.this, CameraActivity.class);
-            //intent.putExtra("register",false);
+            Intent intent=new Intent(ExActivity.this, CameraActivity.class);
+            intent.putExtra("register",false);
             //intent.putExtra("ip",editText.getText().toString());
-            Intent intent=new Intent(ExActivity.this, RegisterActivity.class);
+            //Intent intent=new Intent(ExActivity.this, RegisterActivity.class);
             startActivity(intent);
         }
     }
