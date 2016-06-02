@@ -23,7 +23,7 @@ public class Login {
     private byte[] pw=new byte[320];
     private byte[] IMEI=new byte[32];
     private byte[] k=new byte[16];
-    private byte[] Original=new byte[336];
+    private byte[] Original=new byte[352];
     private byte[] error={0x00,0x10,0x10,0x10,0x11,0x11,0x11,0x11};
     private byte[] success={0x0c,0x10,0x10,0x10,0x53,0x55,0x43,0x45};
     public static String ip;
@@ -154,7 +154,7 @@ public class Login {
                             for (int i=4;i<36;i++)
                             {
                                 temp[i]=IMEI[i-4];
-                            }
+                        }
                             send(out,temp,36);
                         }
                     }
@@ -165,7 +165,7 @@ public class Login {
                         out = socket.getOutputStream();
                         bin = socket.getInputStream();
                         */JustUseFunction.sms4(sendbuff, RecvNumber-4, k, Encode, 0);
-                        newkey = sm3key(Encode);
+                        newkey = sm3key(Encode, 1);
                         Decode = encrypt(newkey);
                         byte[] temp=new byte[708];
                         temp[0]=0x09;
@@ -303,10 +303,10 @@ public class Login {
 
     public int save(byte[] value) throws IOException
     {
-        byte[] Front=new byte[416];
+        byte[] Front=new byte[384];
         byte[] Down=new byte[32];
         byte[] SM3Front=new byte[32];
-        byte[] NewK=new byte[16];
+        byte[] NewK=new byte[32];
         for (int i=0;i<416;i++)
         {
             if (i<384)
@@ -330,7 +330,7 @@ public class Login {
                 return 0;
             }
         }
-        k= sm3key(NewK);
+        k= sm3key(NewK, 1);
         Original=Front;
         byte[] tmp=new byte[416];
         System.arraycopy(Original,0,tmp,0,352);
@@ -339,20 +339,25 @@ public class Login {
         return 1;
     }
 
-    public byte[] sm3key(byte[] x) throws IOException
+    public byte[] sm3key(byte[] x, int type) throws IOException
     {
         byte[] sm3 = new byte[32];
         byte[] result = new byte[16];
         byte[] sm31 = new byte[16];
         byte[] sm32 = new byte[16];
         SMS4 en = new SMS4();
-        sm3 = SM3.hash(x);
+        if (type == 0)
+        {
+            sm3 = SM3.hash(x);
+        }else {
+            sm3=x;
+        }
         for (int i=0;i < 16;i++)
         {
             sm31[i] = sm3[i];
             sm32[i] = sm3[i+16];
         }
-        en.sms4(sm31, x.length, sm32, result, 0);
+        en.sms4(sm31, 16, sm32, result, 1);
         return result;
     }
 }
