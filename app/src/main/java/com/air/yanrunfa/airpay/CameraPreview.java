@@ -110,7 +110,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 myHandler.sendMessage(msg);
             } catch (IOException e) {
                 failNum++;
-                if (failNum == 5) {
+                if (failNum == 100) {
                     bitmap = Bitmap.createBitmap(bitmap, bitmap.getWidth() / 2 - 250, bitmap.getHeight() / 2 - 250, 500, 500);
                     bundle.putByteArray("palmprint", palmprint.extractionWithROI(bitmap));
                     Message msg = new Message();

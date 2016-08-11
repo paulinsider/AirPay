@@ -120,8 +120,8 @@ public class CameraActivity extends Activity {
                 }
             }
             else if (msg.what==EXTRACTION_FAIL){
-                Toast toast=Toast.makeText(cameraActivity,"掌纹提取失败",Toast.LENGTH_SHORT);
-                toast.show();
+                //Toast toast=Toast.makeText(cameraActivity,"掌纹提取失败",Toast.LENGTH_SHORT);
+                //toast.show();
             }
         }
     }

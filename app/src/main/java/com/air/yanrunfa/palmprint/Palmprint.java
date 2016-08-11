@@ -410,9 +410,9 @@ public class Palmprint {
         double averageCb=averageColor.val[2];
 
         //粗略判断得到的子矩阵是否处于皮肤区域，否则抛出异常
-        if (averageCr<120||averageCr>180){
-            //if (averageCb<70||averageCb>130){
-                Log.v("error","Hand Color Error");
+        //if (averageCr<120||averageCr>180){
+        if (averageCb<120||averageCb>150){
+                Log.v("error","Hand Color Error " + averageCb);
                 throw new IOException("Wrong Hand");
             //}
         }

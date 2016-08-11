@@ -19,7 +19,7 @@ import java.net.UnknownHostException;
 public class Register {
     private final static String LOCK_PASSWORD_SALT_FILE = "password_salt";
     private final static String LOCK_PASSWORD_SALT_KEY = "lockscreen.password_salt";
-    private byte[] pw=new byte[320];
+    private byte[] pw=new byte[352];
     private String ip;
     private byte[] s0=new byte[16];
     private byte[] IMEI=new byte[32];
@@ -28,7 +28,7 @@ public class Register {
     private byte[] error={0x00,0x10,0x10,0x10,0x11,0x11,0x11,0x11};
     private byte[] success={0x0b,0x10,0x10,0x10,0x53,0x55,0x43,0x45};
     private int fffflag=0;
-    private byte[] save=new byte[352];
+    private byte[] save=new byte[400];
     private Context ctx;
     private int hah=0;
         private String ie;
@@ -42,7 +42,6 @@ public class Register {
         ie=imei;
         IMEI=SM3.hash(imei.getBytes());
         s0[0]=0;
-        //s0=MD5.strToMD5("93310981");
     }
     public void work()
     {
@@ -56,29 +55,24 @@ public class Register {
         byte[] RegSignal = {0x01, 0x01, 0x01, 0x01, 0x52, 0x45, 0x47, 0x54};
         int RecvNumber = 0;
         SMS4 JustUseFunction = new SMS4();
-        byte[] Encode = new byte[432];
-        byte[] Decode01 = new byte[416];
+        byte[] Encode = new byte[800];
+        byte[] Decode01 = new byte[476];
         public void run() {
             try {
                 int fflag=0;
                 socket = new Socket(ip, 10000);
                 OutputStream out = socket.getOutputStream();
                 InputStream bin = socket.getInputStream();
-                //BufferedReader bin=new BufferedReader(new InputStreamReader(bbin));
                 while (true) {
-                   /* socket.close();
-                    socket = new Socket(ip, 10000);
-                    out = socket.getOutputStream();
-                    bin=socket.getInputStream();
-                    */if (fflag==0) {
+                    if (fflag==0) {
                         send(out, RegSignal, 8);
                         fflag=1;
                         fffflag=0;
                     }
-                    byte[] Recv = new byte[800];
+                    byte[] Recv = new byte[1000];
                     RecvNumber = recv(bin, Recv);
                     int flag = Recv[0];
-                    byte[] sendbuff = new byte[800];
+                    byte[] sendbuff = new byte[1000];
                     for (int i = 4; i < RecvNumber; i++) {
                         sendbuff[i - 4] = Recv[i];
                     }
@@ -88,11 +82,7 @@ public class Register {
                         fffflag=0;
                     }
                     if (flag == 2) {
-                        /*socket.close();
-                        socket = new Socket(ip, 10000);
-                        out = socket.getOutputStream();
-                        bin = socket.getInputStream();
-                        */while(s0[0]==0||fffflag==0)
+                        while(s0[0]==0||fffflag==0)
                         {
 
                         }
@@ -105,18 +95,12 @@ public class Register {
                         sendbuff[1] = 0x10;
                         sendbuff[2] = 0x10;
                         sendbuff[3] = 0x10;
-                        for (int i = 4; i < 388; i++) {
+                        for (int i = 4; i < 420; i++) {
                             sendbuff[i] = Decode01[i - 4];
                         }
-                        send(out, sendbuff, 388);
-                        //RecvNumber = recv(bin, Recv);
+                        send(out, sendbuff, 420);
                     }
                     if (flag == 4) {
-                        /*socket.close();
-                        socket = new Socket(ip, 10000);
-                        out = socket.getOutputStream();
-                        bin = socket.getInputStream();
-                        */
                         JustUseFunction.sms4(sendbuff, RecvNumber - 4, k, Encode, 0);
                         if (save(Encode) == 1) {
                             SharedPreferences sp = ctx.getSharedPreferences(LOCK_PASSWORD_SALT_FILE, ctx.MODE_PRIVATE);
@@ -127,8 +111,8 @@ public class Register {
                                 t= sp.getLong(LOCK_PASSWORD_SALT_KEY, 0);
                                 //t=1231;
                             }
-                            byte[] MustSave = new byte[368];
-                            char[] turn = new char[368];
+                            byte[] MustSave = new byte[400];
+                            char[] turn = new char[400];
                             byte[] b = new byte[16];
                             String FinalSave;
 
@@ -140,8 +124,8 @@ public class Register {
                             {
                                 b[i]=0x01;
                             }
-                            JustUseFunction.sms4(save, 368, b, MustSave, 1);
-                            for (int i = 0; i < 368; i++) {
+                            JustUseFunction.sms4(save, 400, b, MustSave, 1);
+                            for (int i = 0; i < 400; i++) {
                                 turn[i] = (char) MustSave[i];
                             }
                             FinalSave = String.valueOf(turn);
@@ -164,138 +148,20 @@ public class Register {
                     }
 
                 }
-                /*
-                while (true) {
-
-                }\
-                    int flag = 1;
-                    RecvNumber = recv(bin, Recv);
-                    for (int i = RecvNumber - 8; i < RecvNumber - 1 && RecvNumber % 4 == 0; i++) {
-                        if (Recv[i] != 0x10)
-                            flag = 0;
-                    }
-                    if (flag == 0) {
-                        continue;
-                    }
-                    byte[] Receive = new byte[800];
-                    for (int i = 0; i < RecvNumber - 8; i++) {
-                        Receive[i] = Recv[i];
-                    }
-                    switch ((int) Recv[RecvNumber - 1]) {
-                        case 1:
-                            JustUseFunction.sms4(Receive, RecvNumber, s0, Encode, 0);
-                            k = Encode;
-                            Decode01 = Encryt(k);
-                            send(out, Decode01, 416);
-                            break;
-                        case 2:
-                            JustUseFunction.sms4(Receive, RecvNumber, k, Encode, 0);
-                            if (save(Encode) == 1) {
-                                send(out, success, 4);
-                                socket.close();
-                                Login logn = new Login(pw, ip, IMEI, Original, k);
-                                logn.work();
-                                break;
-                            } else {
-                                send(out, error, 20);
-                                continue;
-                            }
-                    }
-
-                while(true)
-                {
-                    int flag=1;
-                    send(out,RegSignal,4);
-                    RecvNumber=recv(bin,Recv);
-                    if (RecvNumber==-1)
-                        flag=0;
-                    if (RecvNumber==16)
-                    {
-                        int fflag=0;
-                        for (int i=0;i<16;i++)
-                        {
-                            if (Recv[i]!=((byte)0xFF))
-                            {
-                                fflag=1;
-                            }
-                        }
-                        if (fflag==0)
-                            flag=0;
-                    }
-                    if (flag==0)
-                    {
-                        send(out,error,20);
-                        continue;
-                    }
-                    else
-                        break;
-                }
-
-                JustUseFunction.sms4(Recv,RecvNumber,s0,Encode,0);
-                k=Encode;
-                while (true)
-                {
-                    int flag=1;
-                    Decode01=Encryt(k);
-                    send(out,Decode01,416);
-                    RecvNumber=recv(bin,Recv);
-                    if(RecvNumber!=432)
-                    {
-                        send(out,error,20);
-                        continue;
-                    }
-                    JustUseFunction.sms4(Recv,RecvNumber,k,Encode,0);
-                    if (save(Encode)==1)
-                    {
-                        SharedPreferences sp=ctx.getSharedPreferences(LOCK_PASSWORD_SALT_FILE,ctx.MODE_PRIVATE);
-                        SharedPreferences saveOriginal=ctx.getSharedPreferences("Original",ctx.MODE_PRIVATE);
-                        long t=sp.getLong(LOCK_PASSWORD_SALT_KEY,0);
-                        byte[] MustSave=new byte[416];
-                        char[] turn=new char[416];
-                        byte[] b=new byte[8];
-                        String FinalSave;
-
-                        for (int i = 0; i < b.length; i++) {
-                            b[i] = new Long(t & 0xff).byteValue();// 将最低位保存在最低位
-                            t= t>> 8; // 向右移8位
-                        }
-                        JustUseFunction.sms4(save,416,b,MustSave,1);
-                        for (int i=0;i<416;i++)
-                        {
-                            turn[i]=(char)MustSave[i];
-                        }
-                        FinalSave=String.valueOf(turn);
-                        SharedPreferences.Editor editor =saveOriginal.edit();
-                        editor.putString("cipher",FinalSave);
-                        editor.commit();
-
-                        send(out,success,4);
-                        socket.close();
-                        break;
-                    }
-                    else
-                    {
-                        send(out,error,20);
-                        continue;
-                    }
-                }*/
-
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 e.printStackTrace();
             }
-
         }
     }
 
     public void send(OutputStream out,byte[] data,int len)
     {
-        byte[] ans=new byte[800];
+        byte[] ans=new byte[1000];
         byte[] temp=new byte[4];
         try
         {
@@ -346,47 +212,40 @@ public class Register {
 
     public byte[] Encryt(byte[] key) throws IOException
     {
-        //char[] aaa=new char[352];
-        //String bbb;
-        byte[] EncrytAnswer=new byte[384];
-        byte[] value=new byte[384];
-        byte[] PwIMEI=new byte[352];
+        byte[] EncrytAnswer=new byte[416];
+        byte[] value=new byte[416];
+        byte[] PwIMEI=new byte[384];
         byte[] SM3PwIMEI=new byte[16];
         SMS4 temp=new SMS4();
-        System.arraycopy(pw,0,PwIMEI,0,320);
-        System.arraycopy(IMEI,0,PwIMEI,320,32);
-        /*for (int i=0;i<352;i++)
-        {
-            aaa[i]=(char)PwIMEI[i];
-        }
-        bbb=String.valueOf(aaa);*/
+        System.arraycopy(pw,0,PwIMEI,0,352);
+        System.arraycopy(IMEI,0,PwIMEI,352,32);
         SM3PwIMEI=SM3.hash(PwIMEI);
-        System.arraycopy(pw,0,value,0,320);
-        System.arraycopy(IMEI,0,value,320,32);
-        System.arraycopy(SM3PwIMEI,0,value,352,32);
-        temp.sms4(value,384,key,EncrytAnswer,1);
+        System.arraycopy(pw,0,value,0,352);
+        System.arraycopy(IMEI,0,value,352,32);
+        System.arraycopy(SM3PwIMEI,0,value,384,32);
+        temp.sms4(value,416,key,EncrytAnswer,1);
         return EncrytAnswer;
     }
 
     public int save(byte[] value) throws IOException
     {
-        byte[] Front=new byte[384];
+        byte[] Front=new byte[416];
         byte[] Down=new byte[32];
         byte[] SM3Front=new byte[32];
         byte[] NewK=new byte[32];
-        for (int i=0;i<416;i++)
+        for (int i=0;i<448;i++)
         {
-            if (i<384)
+            if (i<416)
             {
                 Front[i]=value[i];
-                if (i>=352&&i<384)
+                if (i>=384&&i<416)
                 {
-                    NewK[i-352]=value[i];
+                    NewK[i-384]=value[i];
                 }
             }
             else
             {
-                Down[i-384]=value[i];
+                Down[i-416]=value[i];
             }
         }
         SM3Front=SM3.hash(Front);
@@ -399,9 +258,9 @@ public class Register {
         }
         k= sm3key(NewK, 1);
         Original=Front;
-        byte[] tmp=new byte[416];
-        System.arraycopy(Original,0,tmp,0,352);
-        System.arraycopy(k,0,tmp,352,16);
+        byte[] tmp=new byte[400];
+        System.arraycopy(Original,0,tmp,0,384);
+        System.arraycopy(k,0,tmp,384,16);
         save=tmp;
         return 1;
     }

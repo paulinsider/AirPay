@@ -14,6 +14,8 @@ import com.air.network.Cdata;
 import com.air.network.ExitAppliation;
 import com.air.network.Login;
 
+import java.io.IOException;
+
 
 public class TransferActivity extends Activity {
     EditText moneyTextView;
@@ -40,8 +42,12 @@ public class TransferActivity extends Activity {
                 Money[2]=(byte)((num>>8)&0xff);
                 Money[1]=(byte)((num>>16)&0xff);
                 Money[0]=(byte)(num>>24);
-                Cdata h=new Cdata(Login.ip,Login.ie,4,ie2,Money);
-                h.work();
+                try {
+                    Cdata h=new Cdata(Login.ip,Login.ie,4,ie2,Money);
+                    h.work();
+                }catch (IOException e){
+
+                }
                 while (Cdata.ffflag==0)
                 {
 

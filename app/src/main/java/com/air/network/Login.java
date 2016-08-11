@@ -20,14 +20,14 @@ public class Login {
     private final static String LOCK_PASSWORD_SALT_KEY = "lockscreen.password_salt";
     private byte[] logn={0x05,0x10,0x10,0x10,0x4C,0x4F,0x47,0x4E};
     private byte[] accp={0x06,0x10,0x10,0x10,0x41,0x43,0x43,0x50};
-    private byte[] pw=new byte[320];
+    private byte[] pw=new byte[352];
     private byte[] IMEI=new byte[32];
     private byte[] k=new byte[16];
-    private byte[] Original=new byte[352];
+    private byte[] Original=new byte[384];
     private byte[] error={0x00,0x10,0x10,0x10,0x11,0x11,0x11,0x11};
     private byte[] success={0x0c,0x10,0x10,0x10,0x53,0x55,0x43,0x45};
     public static String ip;
-    private byte[] save=new byte[368];
+    private byte[] save=new byte[400];
     private Context ctx;
     private long t;
     private byte[] b=new byte[16];
@@ -65,19 +65,19 @@ public class Login {
         byte[] finalcipher=new byte[416];
         byte[] finabyte=new byte[416];
         ccipher=Cipher.toCharArray();
-        for (int i=0;i<368;i++)
+        for (int i=0;i<400;i++)
             finalcipher[i]=(byte)ccipher[i];
         SMS4 JustUse=new SMS4();
-        JustUse.sms4(finalcipher,368,b,finabyte,0);
-        for (int i=0;i<368;i++)
+        JustUse.sms4(finalcipher,400,b,finabyte,0);
+        for (int i=0;i<400;i++)
         {
-            if (i<352)
+            if (i<384)
             {
                 Original[i]=finabyte[i];
             }
             else
             {
-                k[i-352]=finabyte[i];
+                k[i-384]=finabyte[i];
             }
         }
     }
@@ -91,13 +91,13 @@ public class Login {
     class WorkThread extends Thread
     {
         int RecvNumber=0;
-        byte[] Recv=new byte[432];
+        byte[] Recv=new byte[1000];
         byte[] newkey = new byte[16];
         SMS4 JustUseFunction=new SMS4();
         int flag=0,fflag=0;
-        byte[] Encode=new byte[432];
-        byte[] Decode=new byte[800];
-        byte[] Encode01=new byte[432];
+        byte[] Encode=new byte[788];
+        byte[] Decode=new byte[1000];
+        byte[] Encode01=new byte[448];
         public void run()
         {
             try{
@@ -108,33 +108,26 @@ public class Login {
 
                 while (true)
                 {
-                    if (wronflag>5)
-                    {
-                        break;
-                    }
                     if (fflag==0)
                     {
                         send(out,logn,8);
                         fflag=1;
                     }
-                        RecvNumber = recv(bin, Recv);
+                    RecvNumber = recv(bin, Recv);
                     int flag = Recv[0];
-                    byte[] sendbuff = new byte[800];
+                    byte[] sendbuff = new byte[1000];
                     for (int i = 4; i < RecvNumber; i++) {
                         sendbuff[i - 4] = Recv[i];
                     }
                     if (flag==13)
                     {
                         fflag=0;
-                        wronflag+=1;
+                        wronflag=1;
+                        break;
                     }
                     if (flag==6)
                     {
-                        /*socket.close();
-                        socket = new Socket(ip, 10000);
-                        out = socket.getOutputStream();
-                        bin = socket.getInputStream();
-                        */int hehe=0;
+                        int hehe=0;
                         for (int i=0;i<4;i++)
                         {
                             if (accp[i+4]!=sendbuff[i])
@@ -160,41 +153,30 @@ public class Login {
                     }
                     if (flag==8)
                     {
-                        /*socket.close();
-                        socket = new Socket(ip, 10000);
-                        out = socket.getOutputStream();
-                        bin = socket.getInputStream();
-                        */JustUseFunction.sms4(sendbuff, RecvNumber-4, k, Encode, 0);
+                        JustUseFunction.sms4(sendbuff, RecvNumber-4, k, Encode, 0);
                         newkey = sm3key(Encode, 1);
                         Decode = encrypt(newkey);
-                        byte[] temp=new byte[708];
+                        byte[] temp=new byte[772];
                         temp[0]=0x09;
                         temp[1]=0x10;
                         temp[2]=0x10;
                         temp[3]=0x10;
-                        for (int i=4;i<708;i++)
+                        for (int i=4;i<772;i++)
                         {
                             temp[i]=Decode[i-4];
                         }
-                        send(out,temp,708);
+                        send(out,temp,772);
                     }
 
                     if (flag==10) {
-                        /*socket.close();
-                        socket = new Socket(ip, 10000);
-                        out = socket.getOutputStream();
-                        bin = socket.getInputStream();
-                        */
                         JustUseFunction.sms4(sendbuff, RecvNumber - 4, newkey, Encode01, 0);
                         if (save(Encode01) == 1) {
-                            //SharedPreferences sp = ctx.getSharedPreferences(LOCK_PASSWORD_SALT_FILE, ctx.MODE_PRIVATE);
                             SharedPreferences saveOriginal = ctx.getSharedPreferences("Original", ctx.MODE_PRIVATE);
-
-                            byte[] MustSave = new byte[368];
-                            char[] turn = new char[368];
+                            byte[] MustSave = new byte[400];
+                            char[] turn = new char[400];
                             String FinalSave;
-                            JustUseFunction.sms4(save, 368, b, MustSave, 1);
-                            for (int i = 0; i < 368; i++) {
+                            JustUseFunction.sms4(save, 400, b, MustSave, 1);
+                            for (int i = 0; i < 400; i++) {
                                 turn[i] = (char) MustSave[i];
                             }
                             FinalSave = String.valueOf(turn);
@@ -286,40 +268,39 @@ public class Login {
 
     public byte[] encrypt(byte[] key) throws IOException
     {
-        byte[] EncrytAnswer=new byte[704];
-        byte[] value=new byte[704];
-        byte[] PwYS=new byte[672];
+        byte[] EncrytAnswer=new byte[784];
+        byte[] value=new byte[784];
+        byte[] PwYS=new byte[736];
         byte[] SM3PwYS=new byte[32];
         SMS4 temp=new SMS4();
-        System.arraycopy(pw,0,PwYS,0,320);
-        System.arraycopy(Original,0,PwYS,320,352);
+        System.arraycopy(pw,0,PwYS,0,352);
+        System.arraycopy(Original,0,PwYS,352,384);
         SM3PwYS=SM3.hash(PwYS);
-        //System.arraycopy(pw,0,value,0,320);
-        System.arraycopy(PwYS,0,value,0,672);
-        System.arraycopy(SM3PwYS,0,value,672,32);
-        temp.sms4(value,704,key,EncrytAnswer,1);
+        System.arraycopy(PwYS,0,value,0,736);
+        System.arraycopy(SM3PwYS,0,value,736,32);
+        temp.sms4(value,768,key,EncrytAnswer,1);
         return EncrytAnswer;
     }
 
-    public int save(byte[] value) throws IOException
+    public int  save(byte[] value) throws IOException
     {
-        byte[] Front=new byte[384];
+        byte[] Front=new byte[416];
         byte[] Down=new byte[32];
         byte[] SM3Front=new byte[32];
         byte[] NewK=new byte[32];
-        for (int i=0;i<416;i++)
+        for (int i=0;i<448;i++)
         {
-            if (i<384)
+            if (i<416)
             {
                 Front[i]=value[i];
-                if (i>=352&&i<384)
+                if (i>=384&&i<416)
                 {
-                    NewK[i-352]=value[i];
+                    NewK[i-384]=value[i];
                 }
             }
             else
             {
-                Down[i-384]=value[i];
+                Down[i-416]=value[i];
             }
         }
         SM3Front=SM3.hash(Front);
@@ -332,9 +313,9 @@ public class Login {
         }
         k= sm3key(NewK, 1);
         Original=Front;
-        byte[] tmp=new byte[416];
-        System.arraycopy(Original,0,tmp,0,352);
-        System.arraycopy(k,0,tmp,352,16);
+        byte[] tmp=new byte[400];
+        System.arraycopy(Original,0,tmp,0,384);
+        System.arraycopy(k,0,tmp,384,16);
         save=tmp;
         return 1;
     }

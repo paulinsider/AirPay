@@ -48,15 +48,16 @@ public class RegisterActivity extends Activity {
         editText=(EditText)findViewById(R.id.register_id_code);
         button=(Button)findViewById(R.id.register_button);
         button.setOnClickListener(onClickListener);
-        //bytes=getIntent().getBundleExtra("palmprint").getByteArray("palmprint");
-        byte[] bytes = new byte[384];
-        for (int i =0;i<384;i++)
+        byte[] tmp;
+        tmp=getIntent().getBundleExtra("palmprint").getByteArray("palmprint");
+        byte[] bytes = new byte[352];
+        for (int i =0;i<352;i++)
         {
-            bytes[i] = 0x01;
+            bytes[i] = tmp[i];
         }
         String imei=((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
         //String ip=getIntent().getStringExtra("ip");
-        String ip="101.200.161.130";
+        String ip="192.168.0.103";
         handler=new mHandler(this);
         try{
             register=new Register(bytes,imei,this,ip,handler);

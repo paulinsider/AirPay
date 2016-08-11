@@ -42,8 +42,12 @@ public class PayActivity extends Activity{
             Money[2]=(byte)((num>>8)&0xff);
             Money[1]=(byte)((num>>16)&0xff);
             Money[0]=(byte)(num>>24);
-            Cdata h=new Cdata(Login.ip,Login.ie,4,ie2,Money);
-            h.work();
+            try{
+                Cdata h=new Cdata(Login.ip,Login.ie,4,ie2,Money);
+                h.work();
+            }catch (IOException e){
+            }
+
             while (Cdata.ffflag==0)
             {
 
@@ -84,7 +88,7 @@ public class PayActivity extends Activity{
             bytes=getIntent().getBundleExtra("palmprint").getByteArray("palmprint");
             String imei=((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
             //String ip=getIntent().getStringExtra("ip");
-            String ip="101.200.161.130";
+            String ip="192.168.0.103";
             handler=new mHandler(this);
             try{
                 Login login=new Login(bytes,imei,this,ip,handler);

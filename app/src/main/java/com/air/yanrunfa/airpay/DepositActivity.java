@@ -15,6 +15,8 @@ import com.air.network.Login;
 
 import org.w3c.dom.CDATASection;
 
+import java.io.IOException;
+
 
 public class DepositActivity extends Activity {
     TextView moneyTextView;
@@ -33,8 +35,12 @@ public class DepositActivity extends Activity {
             public void onClick(View v) {
                 String he="";
                 byte[]  num={0x00,0x00,0x00,0x64};
-                Cdata haha=new Cdata(Login.ip,Login.ie,3,he,num);
-                haha.work();
+                try {
+                    Cdata haha=new Cdata(Login.ip,Login.ie,3,he,num);
+                    haha.work();
+                }
+                catch (IOException e) {
+                }
                 while(Cdata.ffflag==0)
                 {
 

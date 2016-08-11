@@ -15,6 +15,8 @@ import com.air.network.Cdata;
 import com.air.network.ExitAppliation;
 import com.air.network.Login;
 
+import java.io.IOException;
+
 
 public class DrawActivity extends Activity {
     Button button_100;
@@ -39,7 +41,11 @@ public class DrawActivity extends Activity {
                     Money[1]=0x00;
                     Money[2]=0x00;
                     Money[3]=(byte)100;
-                    connect();
+                    try{
+                        connect();
+                    }catch (IOException e){
+                    }
+
                     finish();
                 }
 
@@ -59,7 +65,10 @@ public class DrawActivity extends Activity {
                     Money[1] = 0x00;
                     Money[2] = 0x00;
                     Money[3] = (byte) 200;
-                    connect();
+                    try{
+                        connect();
+                    }catch (IOException e){
+                    }
                     finish();
                 }
             }
@@ -78,7 +87,10 @@ public class DrawActivity extends Activity {
                     Money[1] = 0x00;
                     Money[2] = 0x01;
                     Money[3] = (byte) 0xf4;
-                    connect();
+                    try{
+                        connect();
+                    }catch (IOException e){
+                    }
                     finish();
                 }
             }
@@ -97,7 +109,10 @@ public class DrawActivity extends Activity {
                     Money[1] = 0x00;
                     Money[2] = 0x03;
                     Money[3] = (byte) 0xE8;
-                    connect();
+                    try{
+                        connect();
+                    }catch (IOException e){
+                    }
                     finish();
                 }
             }
@@ -116,7 +131,10 @@ public class DrawActivity extends Activity {
                     Money[1] = 0x00;
                     Money[2] = 0x07;
                     Money[3] = (byte) 0xD0;
-                    connect();
+                    try{
+                        connect();
+                    }catch (IOException e){
+                    }
                     finish();
                 }
             }
@@ -147,7 +165,10 @@ public class DrawActivity extends Activity {
                             Toast.makeText(getApplicationContext(), "余额不足！", Toast.LENGTH_SHORT).show();
                         }
                         else {
-                            connect();
+                            try{
+                                connect();
+                            }catch (IOException e){
+                            }
                             finish();
                         }
                     }
@@ -187,7 +208,7 @@ public class DrawActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public int connect()
+    public int connect() throws IOException
     {
         String haha="";
         Cdata hehe=new Cdata(Login.ip,Login.ie,2,haha,Money);

@@ -21,23 +21,23 @@ import java.net.Socket;
  */
 public class Cdata {
     private String ip;
-    private byte[] IMEI=new byte[16];
+    private byte[] IMEI=new byte[32];
     private int kind=0;
-    private byte[] IMEI2=new byte[16];
+    private byte[] IMEI2=new byte[32];
     private byte[] money=new byte[4];
-    private Handler handl;
+    private Handler handler;
     public static char[] name=new char[15];
     public static int Money=0;
     public static int ffflag=0;
     public static int memeda=0;
-    public Cdata(String IP,String ie,int category,String ie2,byte[] mon)
+    public Cdata(String IP,String ie,int category,String ie2,byte[] mon) throws IOException
     {
         ip=IP;
-        IMEI=MD5.strToMD5(ie);
+        IMEI=SM3.hash(ie.getBytes());
         kind=category;
         if (ie2!=null)
         {
-            IMEI2=MD5.strToMD5(ie2);
+            IMEI2=SM3.hash(ie2.getBytes());
         }
         money=mon;
     }
@@ -81,27 +81,27 @@ public class Cdata {
                     {
                         case 1:
                             System.arraycopy(check,0,temp,0,8);
-                            System.arraycopy(IMEI,0,temp,8,16);
-                            send(out,temp,24);
+                            System.arraycopy(IMEI,0,temp,8,32);
+                            send(out,temp,40);
                             break;
                         case 2:
                             System.arraycopy(getm,0,temp,0,8);
-                            System.arraycopy(IMEI,0,temp,8,16);
-                            System.arraycopy(money,0,temp,24,4);
-                            send(out,temp,28);
+                            System.arraycopy(IMEI,0,temp,8,32);
+                            System.arraycopy(money,0,temp,40,4);
+                            send(out,temp,44);
                             break;
                         case 3:
                             System.arraycopy(save,0,temp,0,8);
-                            System.arraycopy(IMEI,0,temp,8,16);
-                            System.arraycopy(money,0,temp,24,4);
-                            send(out,temp,28);
+                            System.arraycopy(IMEI,0,temp,8,32);
+                            System.arraycopy(money,0,temp,40,4);
+                            send(out,temp,44);
                             break;
                         case 4:
                             System.arraycopy(change,0,temp,0,8);
-                            System.arraycopy(IMEI,0,temp,8,16);
-                            System.arraycopy(IMEI2,0,temp,24,16);
-                            System.arraycopy(money,0,temp,40,4);
-                            send(out,temp,44);
+                            System.arraycopy(IMEI,0,temp,8,32);
+                            System.arraycopy(IMEI2,0,temp,40,32);
+                            System.arraycopy(money,0,temp,72,4);
+                            send(out,temp,76);
                             break;
                         case  5:
                             send(out,exit,4);

@@ -50,20 +50,24 @@ public class ExActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         ExitAppliation.getInstance().addActivity(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ex);
-        byte[] source, sm3HashValue;
-
-        source = new byte[]{0x61,0x62,0x63};
-        try {
-            sm3HashValue = SM3.hash(source);
-        } catch (IOException e)
-        {
-            e.getMessage();
-        }
         /*editText=(EditText)findViewById(R.id.ex_ip_address);
         button=(Button)findViewById(R.id.ex_ip_button);
         button.setOnClickListener(onClickListener);*/
         SharedPreferences saveOriginal=getSharedPreferences("Original",ExActivity.this.MODE_PRIVATE);
+        byte[] a = new byte[736];
+        for (int i=0;i<736;i++)
+        {
+            a[i] = 0x01;
+        }
+        byte[] b = new byte[32];
+        try{
+            b = SM3.hash(a);
+            a[0] =0x01;
+        } catch (IOException e)
+        {
+
+        }
+
         if (saveOriginal.getString("cipher",null)==null){
             Intent intent=new Intent(ExActivity.this, CameraActivity.class);
             intent.putExtra("register",true);
@@ -74,7 +78,7 @@ public class ExActivity extends Activity {
         }
         else if (!getIntent().getBooleanExtra("isLogin",false)){
             Intent intent=new Intent(ExActivity.this, CameraActivity.class);
-            intent.putExtra("register",false);
+            intent.putExtra("login",false);
             //intent.putExtra("ip",editText.getText().toString());
             //Intent intent=new Intent(ExActivity.this, RegisterActivity.class);
             startActivity(intent);

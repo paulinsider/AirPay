@@ -17,6 +17,7 @@ import com.air.network.Cdata;
 import com.air.network.ExitAppliation;
 import com.air.network.Login;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 
@@ -51,8 +52,13 @@ public class QueryActivity extends Activity {
         initUI();
         String hehe="";
         byte[] haha=new byte[4];
-        Cdata cha=new Cdata(Login.ip,Login.ie,1,hehe,haha);
-        cha.work();
+        try {
+            Cdata cha=new Cdata(Login.ip,Login.ie,1,hehe,haha);
+            cha.work();
+        }catch (IOException e){
+
+        }
+
         while (Cdata.ffflag==0)
         {
         }

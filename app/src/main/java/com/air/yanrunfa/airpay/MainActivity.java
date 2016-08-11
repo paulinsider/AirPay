@@ -104,31 +104,34 @@ public class MainActivity extends Activity {
 
         if (getIntent().getBooleanExtra("isLogin",false)){
             Bundle bundle=getIntent().getBundleExtra("palmprint");
-            bytes=getIntent().getBundleExtra("palmprint").getByteArray("palmprint");
-            String imei=((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
-            //String ip=getIntent().getStringExtra("ip");
-            String ip="101.200.161.130";
-            handler=new mHandler(this);
             try{
+                byte[] tmp;
+                tmp=getIntent().getBundleExtra("palmprint").getByteArray("palmprint");
+                byte[] bytes = new byte[352];
+                for (int i =0;i<352;i++)
+                {
+                    bytes[i] = tmp[i];
+                }
+                String imei=((TelephonyManager) getSystemService(TELEPHONY_SERVICE)).getDeviceId();
+                String ip="192.168.0.103";
+                handler=new mHandler(this);
                 Login login=new Login(bytes,imei,this,ip,handler);
                 login.work();
-            } catch (IOException e)
-            {
+            } catch (Exception e) {
 
             }
-
-            while(Login.consumingTime==-1)
+            int tmp=0;
+            while (tmp == 0)
             {
-                if (Login.wronflag>5)
-                {
-                    Toast.makeText(getApplicationContext(),"登陆失败重新注册！",Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MainActivity.this,CameraActivity .class));
-                    break;
+                if (Login.wronflag == 1) {
+                    tmp = 1;
+                    Toast.makeText(getApplicationContext(), "掌纹错误，请重试！",Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent(MainActivity.this, CameraActivity.class);
+                    intent.putExtra("login",false);
+                    startActivity(intent);
                 }
             }
-            Login.consumingTime=-1;
-            String hehe=String.valueOf(Login.consumingTime);
-            Toast.makeText(getApplicationContext(),(CharSequence)hehe,Toast.LENGTH_SHORT).show();
+
         }
 
     }
